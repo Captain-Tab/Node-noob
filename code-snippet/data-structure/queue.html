@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>queue</title>
+</head>
+
+<body>
+    <div>
+        <p>实现餐厅点号网页，点击取号按钮，生成一个号码，点击叫号按钮，显示'请x'号就餐</p>
+        <ul>
+            <li>首先选择队列作为数据结构</li>
+            <li>使用push, shift来加入队列和退出队列</li>
+            <li>练习使用call写法</li>
+        </ul>
+    </div>
+    <div>
+        <button id="add">排号</button>
+        你排到<span id="order"></span>号
+    </div>
+    <div>
+        <button id="call">叫号</button>
+        请<span id="timeTogo"></span>号就餐
+    </div>
+    <div>
+        目前有<span id="total"></span>人在排队
+    </div>
+<script>
+    const queue = [];
+    let order = 0;
+
+    const AddButton = document.getElementById('add');
+    const CallButton = document.getElementById('call');
+
+    render = (status) =>{
+        switch (status) {
+            case 1:
+                document.getElementById('total').innerHTML = queue.length.toString();
+                document.getElementById('order').innerHTML = order.toString();
+                break;
+            case 2:
+                document.getElementById('timeTogo').innerHTML = queue[0];
+                queue.shift.call(queue);
+                document.getElementById('total').innerHTML = queue.length.toString();
+                break;
+            default:
+                document.getElementById('total').innerHTML = queue.length.toString();
+                document.getElementById('order').innerHTML = order.toString();
+                document.getElementById('timeTogo').innerHTML = order.toString();
+                break;
+        }
+    }
+
+    render()
+
+    AddButton.onclick = () => {
+        order += 1;
+        queue.push.call(queue, order);
+        render(1)
+    };
+
+    CallButton.onclick = () => {
+       render(2)
+    };
+</script>
+</body>
+</html>

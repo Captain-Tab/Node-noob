@@ -10,16 +10,62 @@ module.exports.add =  async (title) => {
   await db.write(list)
 }
 
-module.exports.clear = async (title) => {
+module.exports.clear = async () => {
   await db.write([])
 }
 
-module.exports.showOptions = async () => {
-  // read current task
-  const list = await db.read()
 
-  inquirer
-  .prompt([
+function complete (list, index) {
+  list[index].done = true
+  db.write(list)
+}
+
+function undone (item) {
+  list[index].done = false
+  db.write(list)
+}
+
+function edit (list, index) {
+  inquirer.prompt({
+    type: 'input',
+    name: 'title',
+    message: 'enter a new title',
+    default: list[index].title
+  }).then((answer3)=> {
+    list[index].title  = answer3.title
+    db.write(list)
+  })
+}
+
+function remove (list, index) {
+  list.splice(index, 1)
+  db.write(list)
+}
+
+
+
+// user selects a task
+function askForAction (list, index) {
+  const actions = {complete,undone,remove,edit}
+  inquirer.prompt({
+    type: 'list',
+    name: 'action',
+    choices: [
+      {name: 'Exit', value: 'exit'},
+      {name: 'Complete', value: 'complete'},
+      {name: 'Undone', value: 'undone'},
+      {name: 'Remove', value: 'remove'},
+      {name: 'Edit', value: 'edit'},
+    ]
+  }).then(answer2 => {
+    const action = actions[answer2.action]
+    action && action(list, index)
+  })
+}
+
+// display all the tasks
+function showTasks (list) {
+  inquirer.prompt([
     {
       type: 'list',
       name: 'index',
@@ -39,59 +85,35 @@ module.exports.showOptions = async () => {
   .then((answer) => {
     const index = parseInt(answer.index)
     if (index >= 0) {
-      // user picked a task
-      inquirer.prompt({
-        type: 'list',
-        name: 'action',
-        choices: [
-          {name: 'Exit', value: 'exit'},
-          {name: 'Complete', value: 'complete'},
-          {name: 'Undone', value: 'undone'},
-          {name: 'Delete', value: 'delete'},
-          {name: 'Edit', value: 'edit'},
-        ]
-      }).then(answer2 => {
-        switch (answer2.action) {
-          case 'exit':
-            break;
-          case 'complete':
-            list[index].done = true
-            db.write(list)
-            break;
-          case 'undone':
-            list[index].done = false
-            db.write(list)
-            break;
-          case 'delete':
-            list.splice(index, 1)
-            db.write(list)
-            break;
-          case 'edit':
-            inquirer.prompt({
-              type: 'input',
-              name: 'title',
-              message: 'enter a new title',
-              default: list[index].title
-            }).then((answer3)=> {
-              list[index].title  = answer3.title
-              db.write(list)
-            })
-            break;
-        }
-      })
+      // user selects an option
+      askForAction(list, index)
     } else if (index === -2) {
       // user create a new task
-      inquirer.prompt({
-        type: 'input',
-        name: 'title',
-        message: 'Please enter a task title'
-      }).then((answer4)=> {
-        list.push({
-          title: answer4.title,
-          done: false
-        })
-        db.write(list)
-      })
+      askForaskForCreateTask(list)
     }
   });
+}
+
+
+
+// create a task
+function askForaskForCreateTask (list) {
+  inquirer.prompt({
+    type: 'input',
+    name: 'title',
+    message: 'Please enter a task title'
+  }).then((answer4)=> {
+    list.push({
+      title: answer4.title,
+      done: false
+    })
+    db.write(list)
+  })
+}
+
+module.exports.showOptions = async () => {
+  // read current task
+  const list = await db.read()
+  // display all the tasks
+  showTasks(list)
 }

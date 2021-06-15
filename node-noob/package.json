@@ -1,10 +1,10 @@
 {
-  "name": "node-noob-2",
+  "name": "node-noob-practice",
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
   "bin": {
-    "t": "cli.js"
+    "go": "cli.js"
   },
   "files": [
     "*.js"
